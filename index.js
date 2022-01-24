@@ -170,7 +170,7 @@ booksAI.get("/publications/id/:id", (req, res) => {
 Route           / publications / isbn / :isbn
 Description     Get a specific publications
 Access          PUBLIC
-Parameters      id
+Parameters      id, isbn
 Method          GET
 */
 booksAI.get("/publications/isbn/:isbn", (req, res) => {
@@ -189,7 +189,7 @@ booksAI.get("/publications/isbn/:isbn", (req, res) => {
 Route           / books / new
 Description     Add a book
 Access          PUBLIC
-Parameters      NONE
+Parameters      newBook
 Method          POST
 */
 booksAI.post("/books/new", (req, res) => {
@@ -226,7 +226,7 @@ booksAI.put("/books/update/title/:isbn", (req, res) => {
 Route           / books / update / author / :isbn
 Description     Update author of a book
 Access          PUBLIC
-Parameters      isbn
+Parameters      isbn, newAuthor
 Method          PUT
 */
 booksAI.put("/books/update/author/:isbn", (req, res) => {
@@ -239,7 +239,7 @@ booksAI.put("/books/update/author/:isbn", (req, res) => {
     });
 
     database.authors.forEach((author) => {
-        if(author.id == newAuthor){
+        if (author.id == newAuthor) {
             author.books.push(isbn);
         }
     });
@@ -251,7 +251,7 @@ booksAI.put("/books/update/author/:isbn", (req, res) => {
 Route           / author / :id
 Description     Update name of author by id
 Access          PUBLIC
-Parameters      id
+Parameters      id, name
 Method          PUT
 */
 booksAI.put("/author/:id", (req, res) => {
@@ -270,7 +270,7 @@ booksAI.put("/author/:id", (req, res) => {
 Route           / publication / :id
 Description     Update name of publication by id
 Access          PUBLIC
-Parameters      id
+Parameters      id, name
 Method          PUT
 */
 booksAI.put("/publication/:id", (req, res) => {
@@ -289,7 +289,7 @@ booksAI.put("/publication/:id", (req, res) => {
 Route           / publication / update / :id
 Description     Add new book to a publication
 Access          PUBLIC
-Parameters      id
+Parameters      id, isbn
 Method          PUT
 */
 booksAI.put("/publication/update/:id", (req, res) => {
@@ -308,7 +308,7 @@ booksAI.put("/publication/update/:id", (req, res) => {
 Route           / authors / new
 Description     Add an author
 Access          PUBLIC
-Parameters      NONE
+Parameters      newAuthor
 Method          POST
 */
 booksAI.post("/authors/new", (req, res) => {
@@ -324,7 +324,7 @@ booksAI.post("/authors/new", (req, res) => {
 Route           / publications / new
 Description     Add a new publication
 Access          PUBLIC
-Parameters      NONE
+Parameters      newPublication
 Method          POST
 */
 booksAI.post("/publications/new", (req, res) => {
@@ -334,6 +334,124 @@ booksAI.post("/publications/new", (req, res) => {
         data: database.publications,
         message: "Update Successful"
     });
+});
+
+
+/*
+Route           / books / delete / author / :id
+Description     Delete an author from a book
+Access          PUBLIC
+Parameters      isbn, id
+Method          DELETE
+*/
+booksAI.delete("/books/delete/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const id = req.body.id;
+
+    // update book database
+    database.books.forEach((book) => {
+        if (book.isbn == isbn) {
+            book.authors = book.authors.filter((author) => author != id);
+        }
+    });
+
+    // update author database
+    database.authors.forEach((author) => {
+        if (author.id == id) {
+            author.books = author.books.filter((book) => book != isbn);
+        }
+    });
+
+    res.json(database);
+});
+
+/*
+Route           / database
+Description     View full database
+Access          PUBLIC
+Parameters      NONE
+Method          GET
+*/
+booksAI.get("/database", (req, res) => {
+    res.json(database);
+});
+
+/*
+Route           / authors / delete/ :id
+Description     Delete an author
+Access          PUBLIC
+Parameters      id
+Method          DELETE
+*/
+booksAI.delete("/authors/delete/:id", (req, res) => {
+    const id = req.params.id;
+    const remainingAuthors = database.authors.filter((author) => author.id != id);
+    database.authors = remainingAuthors;
+    res.json(database.authors);
+});
+
+/*
+Route           / book / delete/ :isbn
+Description     Delete a book from the database
+Access          PUBLIC
+Parameters      isbn
+Method          DELETE
+*/
+booksAI.delete("/books/delete/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const remainingBooks = database.books.filter((book) => book.isbn != isbn);
+    database.books = remainingBooks;
+    res.json(database.books);
+});
+
+/*
+Route           / publication / delete / book / :isbn
+Description     Delete a book from a publication
+Access          PUBLIC
+Parameters      isbn, id
+Method          DELETE
+*/
+booksAI.delete("/publication/delete/book/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const id = req.body.id;
+    
+    // remove book from publications database
+
+    database.publications.forEach((publication) => {
+        if(publication.id == id){
+            publication.books = publication.books.filter((book) => book != isbn);
+        }
+    });
+
+    // remove book from books database
+    database.books.forEach((book) => {
+        if(book.isbn == isbn){
+            book.publication = 0; // 0 we are assuming means there is no recorded publication for this book
+        }
+    });
+
+    res.json(database);
+});
+
+/*
+Route           / publication / delete / :id
+Description     Delete a publication
+Access          PUBLIC
+Parameters      id
+Method          DELETE
+*/
+booksAI.delete("/publication/delete/:id", (req, res) => {
+    // update publication database
+    const id = req.params.id;
+    database.publications = database.publications.filter((publication) => publication.id != id);
+
+    // uopdate book database
+    database.books.forEach((book)=>{
+        if(book.publication == id){
+            book.publication = 0;
+        }
+    });
+    res.json(database);
 });
 
 // start server at port 3000

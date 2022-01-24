@@ -27,7 +27,8 @@ Books:
     Get a list of all books based on category ✅
     Add a book ✅ 
     Update book details ✅
-    Delete an author (from book)
+    Delete an author (from book) ✅
+    Delete a book ✅
 
 Author:
     Get all authors ✅
@@ -35,7 +36,7 @@ Author:
     get a list of all authors based on a specific book ✅
     Add an author ✅
     Update Author Details ✅
-    Delete an author
+    Delete an author ✅
     
 publications
     get a list of all publications ✅
@@ -43,3 +44,5 @@ publications
     Get a list of all publications based on books ✅
     Update details ✅
     Add new book in publication ✅
+    Delete a publication ✅
+    Delete a book from publication ✅
