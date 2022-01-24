@@ -25,21 +25,21 @@ Books:
     Get a specific book ✅
     Get a list of all books by an author ✅
     Get a list of all books based on category ✅
-    Add a book
-    Update book details
+    Add a book ✅ 
+    Update book details ✅
     Delete an author (from book)
 
 Author:
     Get all authors ✅
     get a specific author ✅
     get a list of all authors based on a specific book ✅
-    Add an author
+    Add an author ✅
+    Update Author Details ✅
     Delete an author
-    No need for update as that will be done while adding book
     
 publications
     get a list of all publications ✅
     Get a specific publication ✅
     Get a list of all publications based on books ✅
-    Update details
-    Add new book in publication
+    Update details ✅
+    Add new book in publication ✅

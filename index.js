@@ -202,10 +202,10 @@ booksAI.post("/books/new", (req, res) => {
 });
 
 /*
-Route           / books / update / title
+Route           / books / update / title / :isbn
 Description     Update title of a book
 Access          PUBLIC
-Parameters      NONE
+Parameters      isbn
 Method          PUT
 */
 booksAI.put("/books/update/title/:isbn", (req, res) => {
@@ -220,6 +220,88 @@ booksAI.put("/books/update/title/:isbn", (req, res) => {
     });
 
     return res.json(database.books);
+});
+
+/*
+Route           / books / update / author / :isbn
+Description     Update author of a book
+Access          PUBLIC
+Parameters      isbn
+Method          PUT
+*/
+booksAI.put("/books/update/author/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    const newAuthor = req.body.author;
+    database.books.forEach((book) => {
+        if (book.isbn == isbn) {
+            book.authors.push(newAuthor);
+        }
+    });
+
+    database.authors.forEach((author) => {
+        if(author.id == newAuthor){
+            author.books.push(isbn);
+        }
+    });
+
+    return res.json(database);
+});
+
+/*
+Route           / author / :id
+Description     Update name of author by id
+Access          PUBLIC
+Parameters      id
+Method          PUT
+*/
+booksAI.put("/author/:id", (req, res) => {
+    const id = req.params.id;
+    const name = req.body.name;
+    database.authors.forEach((author) => {
+        if (author.id == id) {
+            author.name = name;
+        }
+    });
+
+    return res.json(database.authors);
+});
+
+/*
+Route           / publication / :id
+Description     Update name of publication by id
+Access          PUBLIC
+Parameters      id
+Method          PUT
+*/
+booksAI.put("/publication/:id", (req, res) => {
+    const id = req.params.id;
+    const name = req.body.name;
+    database.publications.forEach((pub) => {
+        if (pub.id == id) {
+            pub.name = name;
+        }
+    });
+
+    return res.json(database.publications);
+});
+
+/*
+Route           / publication / update / :id
+Description     Add new book to a publication
+Access          PUBLIC
+Parameters      id
+Method          PUT
+*/
+booksAI.put("/publication/update/:id", (req, res) => {
+    const id = req.params.id;
+    const isbn = req.body.isbn;
+    database.publications.forEach((pub) => {
+        if (pub.id == id) {
+            pub.books.push(isbn);
+        }
+    });
+
+    return res.json(database.publications);
 });
 
 /*
