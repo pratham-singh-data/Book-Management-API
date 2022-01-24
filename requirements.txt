@@ -1,0 +1,45 @@
+We are a company that handles books
+
+Book:
+    ISBN
+    Title
+    Author[]
+    language
+    publish date
+    number of pages
+    category[]
+
+Author:
+    Name
+    Id
+    Books[]
+
+Publication:
+    Name
+    Id
+    book[]
+
+we need an api to:
+Books:
+    Get a list of all books ✅
+    Get a specific book ✅
+    Get a list of all books by an author ✅
+    Get a list of all books based on category ✅
+    Add a book
+    Update book details
+    Delete an author (from book)
+
+Author:
+    Get all authors ✅
+    get a specific author ✅
+    get a list of all authors based on a specific book ✅
+    Add an author
+    Delete an author
+    No need for update as that will be done while adding book
+    
+publications
+    get a list of all publications ✅
+    Get a specific publication ✅
+    Get a list of all publications based on books ✅
+    Update details
+    Add new book in publication
