@@ -4,7 +4,7 @@ const booksAI = express(); // initialise express
 
 // get database
 const mongoose = require("mongoose");
-mongoose.connect(process.env.MONGO_URL).then(() => console.log("connection established"));
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("Connection Established"));
 const database = require("./Database/index");
 
 //models
@@ -472,4 +472,4 @@ booksAI.delete("/publication/delete/:id", (req, res) => {
 });
 
 // start server at port 3000
-booksAI.listen(3000, () => console.log("Server is running at port 3000"));
+booksAI.listen(3000, () => console.log("Server is running at port: 3000"));
