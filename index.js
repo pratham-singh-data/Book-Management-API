@@ -1,10 +1,10 @@
-const {
-    response
-} = require("express");
+require("dotenv").config();
 const express = require("express"); // import express
 const booksAI = express(); // initialise express
 
 // get database
+const mongoose = require("mongoose");
+mongoose.connect(process.env.MONGO_URL).then(() => console.log("connection established"));
 const database = require("./Database/index");
 
 // configurations
