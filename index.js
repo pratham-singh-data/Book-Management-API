@@ -7,6 +7,12 @@ const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URL).then(() => console.log("connection established"));
 const database = require("./Database/index");
 
+//models
+const BookModel = require("./database/books");
+const AuthorModel = require("./database/authors");
+const PublicationModel = require("./database/publications");
+
+
 // configurations
 booksAI.use(express.json()); // use json data
 
@@ -17,26 +23,27 @@ Access          PUBLIc
 Parameters      NONE
 Method          GET
 */
-booksAI.get("/", (req, res) => {
-    return res.json({
-        books: database.books
-    });
+booksAI.get("/", async(req, res) => {
+    const getAllBooks = await BookModel.find();
+    return res.json(
+        getAllBooks
+    );
 });
 
 /* 
 Route           /books/:num
 Description     Get all specific books by ISBN
 Access          PUBLIC
-Parameters      num
+Parameters      isbn
 Method          GET
 */
-booksAI.get("/books/:num", (req, res) => {
-    const id = req.params.num;
-    const getSpecificBook = database.books.filter((book) => book.isbn == id);
+booksAI.get("/books/:isbn", async (req, res) => {
+    const isbn = req.params.isbn;
+    const getSpecificBook = await BookModel.findOne({isbn: isbn});
 
-    if (getSpecificBook.length === 0) {
+    if (! getSpecificBook) {
         return res.json({
-            book: `Sorry, The book of ISBN:${id} is not available`
+            book: `Sorry, The book of ISBN:${isbn} is not available`
         });
     }
 
@@ -52,9 +59,11 @@ Access          PUBLIC
 Parameters      num
 Method          GET
 */
-booksAI.get("/books/author/:aid", (req, res) => {
+booksAI.get("/books/author/:aid", async(req, res) => {
     const aid = req.params.aid;
-    const getSpecificBook = database.books.filter((book) => book.authors.includes(parseInt(aid)));
+    const getSpecificBook = await BookModel.find({
+        authors: aid
+    });
 
     if (getSpecificBook.length === 0) {
         return res.json({
@@ -74,11 +83,13 @@ Access          PUBLIC
 Parameters      category
 Method          GET
 */
-booksAI.get("/books/category/:category", (req, res) => {
+booksAI.get("/books/category/:category", async(req, res) => {
     const cat = req.params.category;
-    const reqBook = database.books.filter((book) => book.category.includes(cat));
+    const reqBook = await BookModel.find(
+        {category: cat}
+    );
 
-    if (reqBook.length == 0) {
+    if (reqBook.length === 0) {
         return res.end("Sorry, No books are available");
     }
 
@@ -95,9 +106,9 @@ Access          PUBLIC
 Parameters      NONE
 Method          GET
 */
-booksAI.get("/authors", (req, res) => {
+booksAI.get("/authors", async (req, res) => {
     res.json({
-        "Authors": database.authors
+        "Authors": await AuthorModel.find()
     });
 });
 
@@ -108,11 +119,11 @@ Access          PUBLIC
 Parameters      id
 Method          GET
 */
-booksAI.get("/authors/:id", (req, res) => {
+booksAI.get("/authors/:id", async (req, res) => {
     const id = req.params.id;
-    const reqAuth = database.authors.filter((author) => author.id == id);
+    const reqAuth = await AuthorModel.findOne({id: id});
 
-    if (reqAuth.length == 0) {
+    if (! reqAuth) {
         return res.end("Sorry, this author is not associated with us");
     }
 
@@ -126,11 +137,11 @@ Access          PUBLIC
 Parameters      isbn
 Method          GET
 */
-booksAI.get("/authors/isbn/:isbn", (req, res) => {
+booksAI.get("/authors/isbn/:isbn", async(req, res) => {
     const isbn = req.params.isbn;
-    const reqAuths = database.authors.filter((author) => author.books.includes(isbn));
+    const reqAuths = await AuthorModel.find({books: isbn});
 
-    if (reqAuths.length == 0) {
+    if (reqAuths.length === 0) {
         return res.end("Sorry, This author is not associated with us.");
     }
 
@@ -144,8 +155,8 @@ Access          PUBLIC
 Parameters      NONE
 Method          GET
 */
-booksAI.get("/publications", (req, res) => {
-    res.json(database.publications);
+booksAI.get("/publications", async(req, res) => {
+    res.json(await PublicationModel.find());
 });
 
 /*
@@ -155,11 +166,11 @@ Access          PUBLIC
 Parameters      id
 Method          GET
 */
-booksAI.get("/publications/id/:id", (req, res) => {
+booksAI.get("/publications/id/:id", async(req, res) => {
     const id = req.params.id;
-    const reqPublication = database.publications.filter((pub) => pub.id == id);
+    const reqPublication = await PublicationModel.findOne({id : id});
 
-    if (reqPublication.length == 0) {
+    if (! reqPublication) {
         return res.end("Sorry, this publication is not associated wih us.");
     }
 
@@ -173,9 +184,9 @@ Access          PUBLIC
 Parameters      id, isbn
 Method          GET
 */
-booksAI.get("/publications/isbn/:isbn", (req, res) => {
+booksAI.get("/publications/isbn/:isbn", async(req, res) => {
     const isbn = req.params.isbn;
-    const reqPublication = database.publications.filter((pub) => pub.books.includes(isbn));
+    const reqPublication = await PublicationModel.find({books: isbn});
 
     if (reqPublication.length == 0) {
         return res.end("Sorry, this publication is not associated wih us.");
@@ -192,11 +203,12 @@ Access          PUBLIC
 Parameters      newBook
 Method          POST
 */
-booksAI.post("/books/new", (req, res) => {
+booksAI.post("/books/new", async(req, res) => {
     const newBook = req.body;
-    database.books.push(newBook);
+    await BookModel.create(newBook);
+
     return res.json({
-        data: database.books,
+        data: await BookModel.find(),
         message: "Update Successful"
     });
 });
@@ -311,11 +323,11 @@ Access          PUBLIC
 Parameters      newAuthor
 Method          POST
 */
-booksAI.post("/authors/new", (req, res) => {
+booksAI.post("/authors/new", async(req, res) => {
     const newAuthor = req.body;
-    database.authors.push(newAuthor);
+    await AuthorModel.create(newAuthor);
     return res.json({
-        data: database.authors,
+        data: await AuthorModel.find(),
         message: "Update Successful"
     });
 });
@@ -327,11 +339,12 @@ Access          PUBLIC
 Parameters      newPublication
 Method          POST
 */
-booksAI.post("/publications/new", (req, res) => {
+booksAI.post("/publications/new", async(req, res) => {
     const newPublication = req.body;
-    database.publications.push(newPublication);
+    await PublicationModel.create(newPublication);
+
     return res.json({
-        data: database.publications,
+        data: await PublicationModel.find(),
         message: "Update Successful"
     });
 });
@@ -372,8 +385,12 @@ Access          PUBLIC
 Parameters      NONE
 Method          GET
 */
-booksAI.get("/database", (req, res) => {
-    res.json(database);
+booksAI.get("/database", async(req, res) => {
+    res.json({
+        "Books": await BookModel.find(),
+        "Authors": await AuthorModel.find(),
+        "Publications": await PublicationModel.find()
+    });
 });
 
 /*
