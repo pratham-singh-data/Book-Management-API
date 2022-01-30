@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 
 // define schema
 const AuthorsSchema = {
-    id: Number,
+    id: {
+        type: Number,
+        required: true
+    },
     name: String,
     books: [String]
 };

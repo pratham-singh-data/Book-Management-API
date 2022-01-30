@@ -116,13 +116,18 @@ Parameters      newPublication
 Method          POST
 */
 router.post("/new", async(req, res) => {
-    const newPublication = req.body;
-    await PublicationModel.create(newPublication);
+    try{
+        const newPublication = req.body;
+        await PublicationModel.create(newPublication);
 
-    return res.json({
-        data: await PublicationModel.find(),
-        message: "Update Successful"
-    });
+        return res.json({
+            data: await PublicationModel.find(),
+            message: "Update Successful"
+        });
+    }
+    catch(error){
+        res.json({"error": error.message});
+    }
 });
 
 /*

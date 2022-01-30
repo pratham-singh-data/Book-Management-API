@@ -100,13 +100,18 @@ Parameters      newBook
 Method          POST
 */
 router.post("/new", async (req, res) => {
-    const newBook = req.body;
-    await BookModel.create(newBook);
+    try{
+        const newBook = req.body;
+        await BookModel.create(newBook);
 
-    return res.json({
-        data: await BookModel.find(),
-        message: "Update Successful"
-    });
+        return res.json({
+            data: await BookModel.find(),
+            message: "Update Successful"
+        });
+    }
+    catch(error){
+        return res.json({"error": error.message});
+    }
 });
 
 /*

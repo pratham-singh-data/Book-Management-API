@@ -2,7 +2,10 @@ const mongoose = require("mongoose");
 
 // define schema
 const PublicationsSchema = {
-    id: Number,
+    id: {
+        type: Number,
+        required: true
+    },
     name: String,
     books: [String]
 };
